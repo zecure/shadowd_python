@@ -21,8 +21,6 @@ import urllib
 
 from .connector import Input, Connector, Config
 
-import pprint
-
 class InputCGI(Input):
 	def get_client_ip(self):
 		return os.environ.get(self.config.get('client_ip', default='REMOTE_ADDR'))
@@ -85,8 +83,7 @@ class InputCGI(Input):
 			key = self.unescape_key(path_split[1])
 
 			if path_split[0] == 'SERVER':
-				#os.environ[key] = ''
-				pass
+				os.environ[key] = ''
 			elif path_split[0] == 'COOKIE':
 				cookies[key] = ''
 			else:

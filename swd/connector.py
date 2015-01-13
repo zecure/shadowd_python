@@ -89,7 +89,6 @@ class Input:
 			if not 'path' in entry and 'caller' in entry:
 				if self.get_caller() == entry['caller']:
 					self.input = {}
-
 					break
 			else:
 				if 'caller' in entry:
