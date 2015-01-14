@@ -24,7 +24,6 @@ import json
 import hmac
 import hashlib
 
-
 SHADOWD_CONNECTOR_VERSION        = '1.0.0-python'
 SHADOWD_CONNECTOR_CONFIG         = '/etc/shadowd/connectors.ini'
 SHADOWD_CONNECTOR_CONFIG_SECTION = 'shadowd_python'
@@ -221,7 +220,7 @@ class Connector:
 				input.defuse_input(threats)
 
 			if config.get('debug') and threats:
-				output.log('shadowd: removed threat from client: ' + input.get_client_ip())
+				output.log('shadowd: removed threat from client: ' + input.get_client_ip() + '\n')
 		except:
 			if config.get('debug'):
 				tb = traceback.format_exc()
