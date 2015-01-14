@@ -20,6 +20,7 @@ import traceback
 import ConfigParser
 import re
 import socket
+import ssl
 import json
 import hmac
 import hashlib
@@ -58,6 +59,9 @@ class Config:
 				return default
 
 class Input:
+	def set_config(self, config):
+		self.config = config
+
 	def get_client_ip(self):
 		raise NotImplementedError()
 
@@ -69,9 +73,6 @@ class Input:
 
 	def defuse_input(self, threats):
 		raise NotImplementedError()
-
-	def set_config(self, config):
-		self.config = config
 
 	def get_input(self):
 		return self.input
@@ -146,8 +147,19 @@ class Output:
 		self.config = config
 
 class Connection:
-	def send(self, input, host, port, profile, key):
-		connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	def send(self, input, host, port, profile, key, ssl_cert):
+		connection = False
+		connection_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+		if ssl_cert:
+			connection = ssl.wrap_socket(
+				connection_socket,
+				ca_certs=ssl_cert,
+				cert_reqs=ssl.CERT_REQUIRED
+			)
+		else:
+			connection = connection_socket
+
 		connection.connect((host, port))
 
 		input_data = {
@@ -213,7 +225,8 @@ class Connector:
 				config.get('host', default='127.0.0.1'),
 				config.get('port', default=9115),
 				config.get('profile', required=True),
-				config.get('key', required=True)
+				config.get('key', required=True),
+				config.get('ssl')
 			)
 
 			if not config.get('observe') and threats:
