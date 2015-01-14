@@ -11,6 +11,7 @@ Installation
 You can install the package with easy_install or pip:
 
     easy_install swd
+
     pip install swd
 
 It is also possible to clone this repository and install the package manually:
