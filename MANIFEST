@@ -1,0 +1,7 @@
+README.md
+LICENSE
+swd/__init__.py
+swd/connector.py
+swd/cgi_connector.py
+misc/examples/connectors.ini
+setup.py

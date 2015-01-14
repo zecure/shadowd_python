@@ -14,16 +14,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import os
 from setuptools import setup
+
+README = os.path.join(os.path.dirname(__file__), 'README.md')
+long_description = open(README).read() + '\n\n'
 
 setup(
 	name='swd',
-	version='1.0',
+	version='1.0.0',
 	description='Python connector for Shadow Daemon web application firewall',
+	long_description=long_description,
 	url='http://github.com/zecure/shadowd_python',
 	author='Hendrik Buchwald',
 	author_email='hb@zecure.org',
-	license='GPL',
+	license='GPLv2',
 	packages=['swd'],
-	zip_safe=False
+	classifiers=[
+		'Development Status :: 5 - Production/Stable',
+		'Intended Audience :: System Administrators',
+		'Environment :: Web Environment',
+		'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
+		'Programming Language :: Python :: 2',
+		'Topic :: Internet :: WWW/HTTP',
+		'Topic :: System :: Networking :: Firewalls',
+	],
+	keywords='waf security',
 )

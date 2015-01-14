@@ -128,6 +128,12 @@ class Input:
 		return output
 
 class Output:
+	def set_config(self, config):
+		self.config = config
+
+	def error(self):
+		raise NotImplementedError()
+
 	def log(self, message):
 		file = self.config.get('log', default='/var/log/shadowd.log')
 		handler = open(file, 'a')
@@ -140,15 +146,9 @@ class Output:
 
 		handler.close()
 
-	def error(self):
-		raise NotImplementedError()
-
-	def set_config(self, config):
-		self.config = config
-
 class Connection:
 	def send(self, input, host, port, profile, key, ssl_cert):
-		connection = False
+		connection = None
 		connection_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 		if ssl_cert:
