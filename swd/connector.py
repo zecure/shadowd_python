@@ -1,6 +1,6 @@
 # Shadow Daemon -- Web Application Firewall
 #
-# Copyright (C) 2015 Hendrik Buchwald <hb@zecure.org>
+# Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
 #
 # This file is part of Shadow Daemon. Shadow Daemon is free software: you can
 # redistribute it and/or modify it under the terms of the GNU General Public
@@ -15,6 +15,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import time
+import traceback
 import ConfigParser
 import re
 import socket
@@ -22,7 +24,8 @@ import json
 import hmac
 import hashlib
 
-SHADOWD_CONNECTOR_VERSION        = '0.0.1-python'
+
+SHADOWD_CONNECTOR_VERSION        = '1.0.0-python'
 SHADOWD_CONNECTOR_CONFIG         = '/etc/shadowd/connectors.ini'
 SHADOWD_CONNECTOR_CONFIG_SECTION = 'shadowd_python'
 STATUS_OK                        = 1
@@ -124,6 +127,25 @@ class Input:
 		output.append('' . join(current))
 		return output
 
+class Output:
+	def log(self, message):
+		file = self.config.get('log', default='/var/log/shadowd.log')
+		handler = open(file, 'a')
+
+		if not handler:
+			raise Exception('could not open log file')
+
+		datetime = time.strftime("%Y-%m-%d %H:%M:%S")
+		handler.write(datetime + "\t" + message)
+
+		handler.close()
+
+	def error(self):
+		raise NotImplementedError()
+
+	def set_config(self, config):
+		self.config = config
+
 class Connection:
 	def send(self, input, host, port, profile, key):
 		connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -172,12 +194,13 @@ class Connection:
 	def sign(self, key, json):
 		return hmac.new(key, json, hashlib.sha256).hexdigest()
 
-
 class Connector:
-	def start(self, input):
+	def start(self, input, output):
+		config = Config()
+
 		try:
-			config = Config()
 			input.set_config(config)
+			output.set_config(config)
 
 			input.gather_input()
 
@@ -196,6 +219,17 @@ class Connector:
 
 			if not config.get('observe') and threats:
 				input.defuse_input(threats)
-		except:
-			print "ERROR"
 
+			if config.get('debug') and threats:
+				output.log('shadowd: removed threat from client: ' + input.get_client_ip())
+		except:
+			if config.get('debug'):
+				tb = traceback.format_exc()
+				output.log(tb)
+
+			if not config.get('observe'):
+				output.error()
+
+				return None
+
+		return True

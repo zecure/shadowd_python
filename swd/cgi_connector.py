@@ -1,6 +1,6 @@
 # Shadow Daemon -- Web Application Firewall
 #
-# Copyright (C) 2015 Hendrik Buchwald <hb@zecure.org>
+# Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
 #
 # This file is part of Shadow Daemon. Shadow Daemon is free software: you can
 # redistribute it and/or modify it under the terms of the GNU General Public
@@ -15,11 +15,12 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import sys
 import cgi
 import Cookie
 import urllib
 
-from .connector import Input, Connector, Config
+from .connector import Input, Output, Connector
 
 class InputCGI(Input):
 	def get_client_ip(self):
@@ -29,8 +30,10 @@ class InputCGI(Input):
 		return os.environ.get(self.config.get('caller', default='SCRIPT_FILENAME'))
 
 	def gather_input(self):
+		# Reset input.
 		self.input = {}
 
+		# Save parameters in input.
 		form = cgi.FieldStorage()
 		for key in form:
 			path = os.environ['REQUEST_METHOD'] + '|' + self.escape_key(key)
@@ -42,6 +45,7 @@ class InputCGI(Input):
 			else:
 				self.input[path] = values[0]
 
+		# Save cookies in input.
 		cookie_string = os.environ.get('HTTP_COOKIE')
 		if cookie_string:
 			cookie = Cookie.SimpleCookie()
@@ -50,6 +54,7 @@ class InputCGI(Input):
 			for key in cookie:
 				self.input['COOKIE|' + self.escape_key(key)] = cookie[key].value
 
+		# Save headers in input.
 		for key in os.environ:
 			if key[:5] == 'HTTP_':
 				self.input['SERVER|' + self.escape_key(key)] = os.environ[key]
@@ -103,8 +108,16 @@ class InputCGI(Input):
 
 			os.environ['HTTP_COOKIE'] = new_cookie_string
 
+class OutputCGI(Output):
+	def error(self):
+		print 'Status: 500 Internal Server Error\r\n\r\n'
+		print '<h1>500 Internal Server Error</h1>'
+
 def main():
 	input = InputCGI()
-	Connector().start(input)
+	output = OutputCGI()
+
+	if not Connector().start(input, output):
+		sys.exit(0)
 
 main()
