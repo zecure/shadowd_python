@@ -17,13 +17,13 @@
 import os
 from setuptools import setup
 
-README = os.path.join(os.path.dirname(__file__), 'README.md')
+README = os.path.join(os.path.dirname(__file__), 'README.rst')
 long_description = open(README).read() + '\n\n'
 
 setup(
 	name='swd',
 	version='1.0.0',
-	description='Python connector for Shadow Daemon web application firewall',
+	description='Python connector for the Shadow Daemon web application firewall',
 	long_description=long_description,
 	url='http://github.com/zecure/shadowd_python',
 	author='Hendrik Buchwald',
@@ -39,5 +39,5 @@ setup(
 		'Topic :: Internet :: WWW/HTTP',
 		'Topic :: System :: Networking :: Firewalls',
 	],
-	keywords='waf security',
+	keywords='waf security shadowd',
 )

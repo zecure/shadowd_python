@@ -210,15 +210,18 @@ class Connector:
 		config = Config()
 
 		try:
+			# Add config for subclasses.
 			input.set_config(config)
 			output.set_config(config)
 
+			# Collect user input and remove sensitive data.
 			input.gather_input()
 
 			ignored = config.get('ignored')
 			if ignored:
 				input.remove_ignored(ignored)
 
+			# Establish a connection with the server and transmit the data.
 			connection = Connection()
 			threats = connection.send(
 				input,
@@ -229,9 +232,11 @@ class Connector:
 				config.get('ssl')
 			)
 
+			# If observe is not enabled remove threats.
 			if not config.get('observe') and threats:
 				input.defuse_input(threats)
 
+			# If debug is enabled log threats.
 			if config.get('debug') and threats:
 				output.log('shadowd: removed threat from client: ' + input.get_client_ip() + '\n')
 		except:
