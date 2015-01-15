@@ -141,8 +141,8 @@ class Output:
 		if not handler:
 			raise Exception('could not open log file')
 
-		datetime = time.strftime("%Y-%m-%d %H:%M:%S")
-		handler.write(datetime + "\t" + message)
+		datetime = time.strftime('%Y-%m-%d %H:%M:%S')
+		handler.write(datetime + '\t' + message)
 
 		handler.close()
 

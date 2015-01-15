@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+#
 # Shadow Daemon -- Web Application Firewall
 #
 # Copyright (C) 2014-2015 Hendrik Buchwald <hb@zecure.org>
@@ -21,7 +23,7 @@ README = os.path.join(os.path.dirname(__file__), 'README.rst')
 long_description = open(README).read() + '\n\n'
 
 setup(
-	name='swd',
+	name='shadowd',
 	version='1.0.0',
 	description='Python connector for the Shadow Daemon web application firewall',
 	long_description=long_description,
@@ -29,7 +31,7 @@ setup(
 	author='Hendrik Buchwald',
 	author_email='hb@zecure.org',
 	license='GPLv2',
-	packages=['swd'],
+	packages=['shadowd'],
 	classifiers=[
 		'Development Status :: 5 - Production/Stable',
 		'Intended Audience :: System Administrators',
