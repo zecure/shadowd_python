@@ -1,7 +1,7 @@
 README.rst
 LICENSE
-swd/__init__.py
-swd/connector.py
-swd/cgi_connector.py
+shadowd/__init__.py
+shadowd/connector.py
+shadowd/cgi_connector.py
 misc/examples/connectors.ini
 setup.py
