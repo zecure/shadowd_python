@@ -217,7 +217,7 @@ class Connector:
 			# Collect user input and remove sensitive data.
 			input.gather_input()
 
-			ignored = config.get('ignored')
+			ignored = config.get('ignore')
 			if ignored:
 				input.remove_ignored(ignored)
 
