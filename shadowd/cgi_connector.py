@@ -113,6 +113,8 @@ class OutputCGI(Output):
 		print 'Status: 500 Internal Server Error\r\n\r\n'
 		print '<h1>500 Internal Server Error</h1>'
 
+		return None
+
 def main():
 	input = InputCGI()
 	output = OutputCGI()

@@ -245,8 +245,6 @@ class Connector:
 				output.log(tb)
 
 			if not config.get('observe'):
-				output.error()
-
-				return None
+				return output.error()
 
 		return True

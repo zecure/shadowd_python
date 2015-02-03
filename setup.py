@@ -24,7 +24,7 @@ long_description = open(README).read() + '\n\n'
 
 setup(
 	name='shadowd',
-	version='1.0.1',
+	version='1.1.0',
 	description='Python connector for the Shadow Daemon web application firewall',
 	long_description=long_description,
 	url='http://github.com/zecure/shadowd_python',
