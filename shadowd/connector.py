@@ -25,7 +25,7 @@ import json
 import hmac
 import hashlib
 
-SHADOWD_CONNECTOR_VERSION        = '1.1.1-python'
+SHADOWD_CONNECTOR_VERSION        = '1.2.0-python'
 SHADOWD_CONNECTOR_CONFIG         = '/etc/shadowd/connectors.ini'
 SHADOWD_CONNECTOR_CONFIG_SECTION = 'shadowd_python'
 STATUS_OK                        = 1

@@ -38,12 +38,12 @@ Django applications require a small modification. It is necessary to create a ho
 ::
 
     from shadowd.django_connector import InputDjango, OutputDjango, Connector
-    
+
     class ShadowdConnectorMiddleware(object):
         def process_request(self, request):
             input = InputDjango(request)
             output = OutputDjango()
-    
+
             status = Connector().start(input, output)
             if not status == True:
                 return status
@@ -58,3 +58,18 @@ There also has to be an empty *__init__.py* file in the middleware directory. Ne
     )
 
 The connector should be at the beginning of the *MIDDLEWARE_CLASSES* list.
+
+Flask
+------
+Flask applications require a small modification as well. It is necessary to create a hook to intercept requests:
+
+::
+
+    from shadowd.flask_connector import InputFlask, OutputFlask, Connector
+
+    @app.before_request
+    def before_req():
+        input = InputFlask(request)
+        output = OutputFlask()
+
+        Connector().start(input, output)
