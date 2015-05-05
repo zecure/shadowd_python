@@ -14,9 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from django.http import HttpResponseServerError
-
 from .connector import Input, Output, Connector
+from django.http import HttpResponseServerError
 
 class InputDjango(Input):
 	def __init__(self, request):
@@ -100,14 +99,11 @@ class InputDjango(Input):
 				else:
 					post_input[key] = ''
 
-		# Update the query string.
-		self.request.META['QUERY_STRING'] = get_input.urlencode()
+		# Update the GET data.
+		self.request.GET = get_input
 
-		# Delete cached_property, so query string is parsed again.
-		del self.request.GET
-
-		# Update the post dict.
-		self.request._set_post(post_input)
+		# Update the POST data.
+		self.request.POST = post_input
 
 class OutputDjango(Output):
 	def error(self):

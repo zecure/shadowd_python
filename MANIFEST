@@ -4,5 +4,7 @@ shadowd/__init__.py
 shadowd/connector.py
 shadowd/cgi_connector.py
 shadowd/django_connector.py
+shadowd/flask_connector.py
+shadowd/werkzeug_connector.py
 misc/examples/connectors.ini
 setup.py
