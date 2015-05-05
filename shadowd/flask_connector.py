@@ -108,31 +108,14 @@ class InputFlask(Input):
 			elif path_split[0] == 'DATA':
 				self.request.data = ''
 
-		# Update the GET query string.
-		self.request.environ['QUERY_STRING'] = url_encode(get_input, encode_keys=True)
+		# Update the GET data.
+		self.request.args = get_input
 
-		# Delete cached_property, so query string is parsed again.
-		del self.request.args
+		# Update the POST data.
+		self.request.form = post_input
 
-		# Update the POST query string.
-		post_input_query = url_encode(post_input, encode_keys=True)
-		self.request.environ['wsgi.input'] = io.StringIO(unicode(post_input_query))
-		self.request.environ['CONTENT_LENGTH'] = len(post_input_query)
-
-		# Delete cached_property, so query string is parsed again.
-		del self.request.stream
-		del self.request.form
-
-		# Update cookies.
-		new_cookie_string = ''
-
-		for cookie in cookies_input:
-			new_cookie_string += cookie + '=' + cookies_input[cookie] + ';'
-
-		self.request.environ['HTTP_COOKIE'] = new_cookie_string
-
-		# Delete cached_property, so cookie string is parsed again.
-		del self.request.cookies
+		# Update the cookies.
+		self.request.cookies = cookies_input
 
 class OutputFlask(Output):
 	def error(self):
