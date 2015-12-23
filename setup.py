@@ -17,14 +17,14 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from setuptools import setup
+from setuptools import setup, Command
 
 README = os.path.join(os.path.dirname(__file__), 'README.rst')
 long_description = open(README).read() + '\n\n'
 
 setup(
 	name='shadowd',
-	version='1.2.0',
+	version='2.0.0',
 	description='Python connector for the Shadow Daemon web application firewall',
 	long_description=long_description,
 	url='http://github.com/zecure/shadowd_python',
@@ -42,4 +42,5 @@ setup(
 		'Topic :: System :: Networking :: Firewalls',
 	],
 	keywords='waf security shadowd',
+	test_suite = 'shadowd.tests.test_all',
 )

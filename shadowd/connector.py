@@ -124,7 +124,13 @@ class Input:
 		for char in iterator:
 			if char == '\\':
 				try:
-					current.append(next(iterator))
+					next_char = next(iterator)
+					if next_char == '|':
+						current.append('\\|')
+					elif next_char == '\\':
+						current.append('\\\\')
+					else:
+						current.append(next_char)
 				except StopIteration:
 					current.append('\\')
 			elif char == '|':
