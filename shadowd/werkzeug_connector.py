@@ -27,6 +27,12 @@ class InputWerkzeug(Input):
 	def get_caller(self):
 		return self.request.environ.get(self.config.get('caller', default='PATH_INFO'))
 
+	def get_resource(self):
+		host = self.request.host
+		url = self.request.url
+
+		return url[url.find(host) + len(host):]
+
 	def gather_input(self):
 		# Reset input.
 		self.input = {}
@@ -113,3 +119,7 @@ class InputWerkzeug(Input):
 
 		# Update the cookies.
 		self.request.cookies = cookies_input
+
+	def gather_hashes(self):
+		# Integrity check not supported, because everything is routed through one file.
+		self.hashes = {}

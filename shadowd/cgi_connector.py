@@ -19,6 +19,7 @@ import sys
 import cgi
 import Cookie
 import urllib
+import hashlib
 
 from .connector import Input, Output, Connector
 
@@ -28,6 +29,9 @@ class InputCGI(Input):
 
 	def get_caller(self):
 		return os.environ.get(self.config.get('caller', default='SCRIPT_FILENAME'))
+
+	def get_resource(self):
+		return os.environ.get('REQUEST_URI')
 
 	def gather_input(self):
 		# Reset input.
@@ -107,6 +111,18 @@ class InputCGI(Input):
 				new_cookie_string += cookie + '=' + cookies[cookie] + ';'
 
 			os.environ['HTTP_COOKIE'] = new_cookie_string
+
+	def gather_hashes(self):
+		# Reset hashes.
+		self.hashes = {}
+
+		# Calculate hash of script.
+		sha256 = hashlib.sha256()
+		with open(os.environ.get('SCRIPT_FILENAME'), 'rb') as f:
+			for chunk in iter(lambda: f.read(4096), b''):
+				sha256.update(chunk)
+
+		self.hashes['sha256'] = sha256.hexdigest()
 
 class OutputCGI(Output):
 	def error(self):

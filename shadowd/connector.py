@@ -25,7 +25,7 @@ import json
 import hmac
 import hashlib
 
-SHADOWD_CONNECTOR_VERSION        = '1.2.0-python'
+SHADOWD_CONNECTOR_VERSION        = '2.0.0-python'
 SHADOWD_CONNECTOR_CONFIG         = '/etc/shadowd/connectors.ini'
 SHADOWD_CONNECTOR_CONFIG_SECTION = 'shadowd_python'
 STATUS_OK                        = 1
@@ -68,14 +68,23 @@ class Input:
 	def get_caller(self):
 		raise NotImplementedError()
 
+	def get_resource(self):
+		raise NotImplementedError()
+
 	def gather_input(self):
 		raise NotImplementedError()
 
 	def defuse_input(self, threats):
 		raise NotImplementedError()
 
+	def gather_hashes(self):
+		raise NotImplementedError()
+
 	def get_input(self):
 		return self.input
+
+	def get_hashes(self):
+		return self.hashes
 
 	def remove_ignored(self, file):
 		handler = open(file, 'r')
@@ -166,7 +175,9 @@ class Connection:
 			'version':   SHADOWD_CONNECTOR_VERSION,
 			'client_ip': input.get_client_ip(),
 			'caller':    input.get_caller(),
-			'input':     input.get_input()
+			'resource':  input.get_resource(),
+			'input':     input.get_input(),
+			'hashes':    input.get_hashes()
 		}
 
 		json_data = json.dumps(input_data)
@@ -220,6 +231,9 @@ class Connector:
 			ignored = config.get('ignore')
 			if ignored:
 				input.remove_ignored(ignored)
+
+			# Collect cryptographically secure checksums of the executed script.
+			input.gather_hashes()
 
 			# Establish a connection with the server and transmit the data.
 			connection = Connection()

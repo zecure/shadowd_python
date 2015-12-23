@@ -27,6 +27,9 @@ class InputDjango(Input):
 	def get_caller(self):
 		return self.request.META.get(self.config.get('caller', default='PATH_INFO'))
 
+	def get_resource(self):
+		return self.request.get_full_path()
+
 	def gather_input(self):
 		# Reset input.
 		self.input = {}
@@ -104,6 +107,10 @@ class InputDjango(Input):
 
 		# Update the POST data.
 		self.request.POST = post_input
+
+	def gather_hashes(self):
+		# Integrity check not supported, because everything is routed through one file.
+		self.hashes = {}
 
 class OutputDjango(Output):
 	def error(self):
