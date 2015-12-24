@@ -62,7 +62,9 @@ class InputWerkzeug(Input):
 				self.input[path] = values[0]
 
 		# Save raw data in input. Has to be done AFTER post_input!
-		self.input['DATA|raw'] = self.request.data
+		data_raw = self.request.data
+		if data_raw:
+			self.input['DATA|raw'] = data_raw
 
 		# Save cookies in input.
 		for key in self.request.cookies:
