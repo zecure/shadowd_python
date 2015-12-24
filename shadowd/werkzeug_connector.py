@@ -75,11 +75,24 @@ class InputWerkzeug(Input):
 			if key[:5] == 'HTTP_':
 				self.input['SERVER|' + self.escape_key(key)] = self.request.environ[key]
 
+		# Save the file names of uploads.
+		files_input = self.request.files
+		for key in files_input:
+			path = 'FILES|' + self.escape_key(key)
+			values = files_input.getlist(key)
+
+			if len(values) > 1:
+				for index, value in enumerate(values):
+					self.input[path + '|' + str(index)] = value.filename
+			else:
+				self.input[path] = values[0].filename
+
 	def defuse_input(self, threats):
 		# Get the input and create copy to make it mutable.
 		get_input = self.request.args.copy()
 		post_input = self.request.form.copy()
 		cookies_input = self.request.cookies.copy()
+		files_input = self.request.files.copy()
 
 		# Remove threats.
 		for path in threats:
@@ -110,6 +123,9 @@ class InputWerkzeug(Input):
 					post_input.setlist(key, post_list)
 				else:
 					post_input[key] = u''
+			elif path_split[0] == 'FILES':
+				# get/post approach for arrays does not work, because the upload is deleted.
+				del files_input[key]
 			elif path_split[0] == 'DATA':
 				self.request.data = u''
 
@@ -121,6 +137,9 @@ class InputWerkzeug(Input):
 
 		# Update the cookies.
 		self.request.cookies = cookies_input
+
+		# Update the file uploads.
+		self.request.files = ImmutableMultiDict(files_input)
 
 	def gather_hashes(self):
 		# Integrity check not supported, because everything is routed through one file.
