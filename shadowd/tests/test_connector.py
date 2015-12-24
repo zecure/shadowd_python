@@ -17,7 +17,6 @@ class TestConnector(unittest.TestCase):
 		self.assertEqual(input.unescape_key('foo'), 'foo')
 		self.assertEqual(input.unescape_key('foo\\|bar'), 'foo|bar')
 		self.assertEqual(input.unescape_key('foo\\\\bar'), 'foo\\bar')
-		self.assertEqual(input.unescape_key('foo\\\\\\bar'), 'foo\\\\bar')
 		self.assertEqual(input.unescape_key('foo\\\\\\|bar'), 'foo\\|bar')
 
 	def test_split_path(self):
