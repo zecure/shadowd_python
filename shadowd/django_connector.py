@@ -67,6 +67,18 @@ class InputDjango(Input):
 			if key[:5] == 'HTTP_':
 				self.input['SERVER|' + self.escape_key(key)] = self.request.META[key]
 
+		# Save the file names of uploads.
+		files_input = self.request.FILES
+		for key in files_input:
+			path = 'FILES|' + self.escape_key(key)
+			values = files_input.getlist(key)
+
+			if len(values) > 1:
+				for index, value in enumerate(values):
+					self.input[path + '|' + str(index)] = value.name
+			else:
+				self.input[path] = values[0].name
+
 	def defuse_input(self, threats):
 		# Get the input and create copy to make it mutable.
 		get_input = self.request.GET.copy()
@@ -101,6 +113,9 @@ class InputDjango(Input):
 					post_input.setlist(key, post_list)
 				else:
 					post_input[key] = ''
+			elif path_split[0] == 'FILES':
+				# Can't remove file uploads, so request has to be stopped.
+				raise Exception('threat in file upload')
 
 		# Update the GET data.
 		self.request.GET = get_input
