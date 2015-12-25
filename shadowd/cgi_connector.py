@@ -40,14 +40,17 @@ class InputCGI(Input):
 		# Save parameters in input.
 		form = cgi.FieldStorage()
 		for key in form:
-			path = os.environ['REQUEST_METHOD'] + '|' + self.escape_key(key)
-			values = form.getlist(key)
-
-			if len(values) > 1:
-				for index, value in enumerate(values):
-					self.input[path + '|' + str(index)] = value
+			if isinstance(form[key], list):
+				for index, element in enumerate(form[key]):
+					if element.filename:
+						self.input['FILES|' + self.escape_key(key) + '|' + str(index)] = element.filename
+					else:
+						self.input[os.environ['REQUEST_METHOD'] + '|' + self.escape_key(key) + '|' + str(index)] = element.value
 			else:
-				self.input[path] = values[0]
+				if form[key].filename:
+					self.input['FILES|' + self.escape_key(key)] = form[key].filename
+				else:
+					self.input[os.environ['REQUEST_METHOD'] + '|' + self.escape_key(key)] = form[key].value
 
 		# Save cookies in input.
 		cookie_string = os.environ.get('HTTP_COOKIE')
@@ -95,6 +98,9 @@ class InputCGI(Input):
 				os.environ[key] = ''
 			elif path_split[0] == 'COOKIE':
 				cookies[key] = ''
+			elif path_split[0] == 'FILES':
+				# Can't remove file uploads, so request has to be stopped.
+				raise Exception('threat in file upload')
 			else:
 				if len(path_split) == 3:
 					parameters[key][int(path_split[2])] = ''
