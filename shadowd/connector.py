@@ -254,7 +254,13 @@ class Connector:
 
 			# If observe is not enabled remove threats.
 			if not config.get('observe') and threats:
-				input.defuse_input(threats)
+				# If defuse_input returns a negative answer this means that the complete request has to
+				# be stopped. This is necessary for threats that can not be removed via the public api.
+				if not input.defuse_input(threats):
+					if config.get('debug'):
+						output.log('shadowd: stopped request from client: ' + input.get_client_ip() + '\n')
+
+					return output.error()
 
 			# If debug is enabled log threats.
 			if config.get('debug') and threats:

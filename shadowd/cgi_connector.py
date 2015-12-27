@@ -100,7 +100,7 @@ class InputCGI(Input):
 				cookies[key] = ''
 			elif path_split[0] == 'FILES':
 				# Can't remove file uploads, so request has to be stopped.
-				raise Exception('threat in file upload')
+				return False
 			else:
 				if len(path_split) == 3:
 					parameters[key][int(path_split[2])] = ''
@@ -117,6 +117,9 @@ class InputCGI(Input):
 				new_cookie_string += cookie + '=' + cookies[cookie] + ';'
 
 			os.environ['HTTP_COOKIE'] = new_cookie_string
+
+		# Don't stop the complete request.
+		return True
 
 	def gather_hashes(self):
 		# Reset hashes.

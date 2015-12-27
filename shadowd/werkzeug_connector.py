@@ -124,7 +124,7 @@ class InputWerkzeug(Input):
 				else:
 					post_input[key] = u''
 			elif path_split[0] == 'FILES':
-				# get/post approach for arrays does not work, because the upload is deleted.
+				# GET/POST approach for arrays does not work, because the upload is deleted.
 				del files_input[key]
 			elif path_split[0] == 'DATA':
 				self.request.data = u''
@@ -140,6 +140,9 @@ class InputWerkzeug(Input):
 
 		# Update the file uploads.
 		self.request.files = ImmutableMultiDict(files_input)
+
+		# Don't stop the complete request.
+		return True
 
 	def gather_hashes(self):
 		# Integrity check not supported, because everything is routed through one file.

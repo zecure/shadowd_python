@@ -115,13 +115,16 @@ class InputDjango(Input):
 					post_input[key] = ''
 			elif path_split[0] == 'FILES':
 				# Can't remove file uploads, so request has to be stopped.
-				raise Exception('threat in file upload')
+				return False
 
 		# Update the GET data.
 		self.request.GET = get_input
 
 		# Update the POST data.
 		self.request.POST = post_input
+
+		# Don't stop the complete request.
+		return True
 
 	def gather_hashes(self):
 		# Integrity check not supported, because everything is routed through one file.
