@@ -54,10 +54,10 @@ class TestDjangoConnector(unittest.TestCase):
         r.COOKIES = {'foo': 'bar'}
         r.META = {'HTTP_FOO': 'bar'}
 
-        threats = ['GET|foo', 'POST|foo', 'COOKIE|foo', 'SERVER|HTTP_FOO']
-
         i = shadowd.django_connector.InputDjango(r)
-        self.assertTrue(i.defuse_input(threats))
+
+        threats1 = ['GET|foo', 'POST|foo', 'COOKIE|foo', 'SERVER|HTTP_FOO']
+        self.assertTrue(i.defuse_input(threats1))
         self.assertIn('foo', r.GET)
         self.assertEqual(r.GET['foo'], '')
         self.assertIn('foo', r.POST)
@@ -66,3 +66,6 @@ class TestDjangoConnector(unittest.TestCase):
         self.assertEqual(r.COOKIES['foo'], '')
         self.assertIn('HTTP_FOO', r.META)
         self.assertEqual(r.META['HTTP_FOO'], '')
+
+        threats2 = ['FILES|foo']
+        self.assertFalse(i.defuse_input(threats2))
