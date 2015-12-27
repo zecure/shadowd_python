@@ -70,8 +70,7 @@ class TestWerkzeugConnector(unittest.TestCase):
         environ = {
             'wsgi.input': sys.stdin,
             'wsgi.errors': sys.stderr,
-            'HTTP_FOO': 'bar',
-            'foo': 'bar'
+            'HTTP_FOO': 'bar'
         }
         r = werkzeug.wrappers.Request(environ)
         r.args = werkzeug.datastructures.ImmutableMultiDict({'foo': 'bar'})

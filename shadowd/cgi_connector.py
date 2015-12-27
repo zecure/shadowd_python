@@ -147,4 +147,5 @@ def main():
     if not Connector().start(input, output):
         sys.exit(0)
 
-main()
+if not os.environ.get('SHADOWD_NO_AUTOLOAD'):
+    main()
