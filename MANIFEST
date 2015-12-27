@@ -9,5 +9,6 @@ shadowd/werkzeug_connector.py
 shadowd/tests/__init__.py
 shadowd/tests/test_connector.py
 shadowd/tests/test_django_connector.py
+shadowd/tests/test_werkzeug_connector.py
 misc/examples/connectors.ini
 setup.py
