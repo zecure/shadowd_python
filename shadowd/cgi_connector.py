@@ -24,127 +24,127 @@ import hashlib
 from .connector import Input, Output, Connector
 
 class InputCGI(Input):
-	def get_client_ip(self):
-		return os.environ.get(self.config.get('client_ip', default='REMOTE_ADDR'))
+    def get_client_ip(self):
+        return os.environ.get(self.config.get('client_ip', default='REMOTE_ADDR'))
 
-	def get_caller(self):
-		return os.environ.get(self.config.get('caller', default='SCRIPT_FILENAME'))
+    def get_caller(self):
+        return os.environ.get(self.config.get('caller', default='SCRIPT_FILENAME'))
 
-	def get_resource(self):
-		return os.environ.get('REQUEST_URI')
+    def get_resource(self):
+        return os.environ.get('REQUEST_URI')
 
-	def gather_input(self):
-		# Reset input.
-		self.input = {}
+    def gather_input(self):
+        # Reset input.
+        self.input = {}
 
-		# Save parameters in input.
-		form = cgi.FieldStorage()
-		for key in form:
-			if isinstance(form[key], list):
-				for index, element in enumerate(form[key]):
-					if element.filename:
-						self.input['FILES|' + self.escape_key(key) + '|' + str(index)] = element.filename
-					else:
-						self.input[os.environ['REQUEST_METHOD'] + '|' + self.escape_key(key) + '|' + str(index)] = element.value
-			else:
-				if form[key].filename:
-					self.input['FILES|' + self.escape_key(key)] = form[key].filename
-				else:
-					self.input[os.environ['REQUEST_METHOD'] + '|' + self.escape_key(key)] = form[key].value
+        # Save parameters in input.
+        form = cgi.FieldStorage()
+        for key in form:
+            if isinstance(form[key], list):
+                for index, element in enumerate(form[key]):
+                    if element.filename:
+                        self.input['FILES|' + self.escape_key(key) + '|' + str(index)] = element.filename
+                    else:
+                        self.input[os.environ['REQUEST_METHOD'] + '|' + self.escape_key(key) + '|' + str(index)] = element.value
+            else:
+                if form[key].filename:
+                    self.input['FILES|' + self.escape_key(key)] = form[key].filename
+                else:
+                    self.input[os.environ['REQUEST_METHOD'] + '|' + self.escape_key(key)] = form[key].value
 
-		# Save cookies in input.
-		cookie_string = os.environ.get('HTTP_COOKIE')
-		if cookie_string:
-			cookie = Cookie.SimpleCookie()
-			cookie.load(cookie_string)
+        # Save cookies in input.
+        cookie_string = os.environ.get('HTTP_COOKIE')
+        if cookie_string:
+            cookie = Cookie.SimpleCookie()
+            cookie.load(cookie_string)
 
-			for key in cookie:
-				self.input['COOKIE|' + self.escape_key(key)] = cookie[key].value
+            for key in cookie:
+                self.input['COOKIE|' + self.escape_key(key)] = cookie[key].value
 
-		# Save headers in input.
-		for key in os.environ:
-			if key[:5] == 'HTTP_':
-				self.input['SERVER|' + self.escape_key(key)] = os.environ[key]
+        # Save headers in input.
+        for key in os.environ:
+            if key[:5] == 'HTTP_':
+                self.input['SERVER|' + self.escape_key(key)] = os.environ[key]
 
-	def defuse_input(self, threats):
-		# Write all parameters to dict.
-		parameters = {}
+    def defuse_input(self, threats):
+        # Write all parameters to dict.
+        parameters = {}
 
-		form = cgi.FieldStorage()
-		for key in form:
-			parameters[key] = form.getlist(key)
+        form = cgi.FieldStorage()
+        for key in form:
+            parameters[key] = form.getlist(key)
 
-		# Write all cookies to dict.
-		cookies = {}
+        # Write all cookies to dict.
+        cookies = {}
 
-		cookie_string = os.environ.get('HTTP_COOKIE')
-		if cookie_string:
-			cookie = Cookie.SimpleCookie()
-			cookie.load(cookie_string)
+        cookie_string = os.environ.get('HTTP_COOKIE')
+        if cookie_string:
+            cookie = Cookie.SimpleCookie()
+            cookie.load(cookie_string)
 
-			for key in cookie:
-				cookies[key] = cookie[key].value
+            for key in cookie:
+                cookies[key] = cookie[key].value
 
-		# Remove threats.
-		for path in threats:
-			path_split = self.split_path(path)
+        # Remove threats.
+        for path in threats:
+            path_split = self.split_path(path)
 
-			if len(path_split) < 2:
-				continue
+            if len(path_split) < 2:
+                continue
 
-			key = self.unescape_key(path_split[1])
+            key = self.unescape_key(path_split[1])
 
-			if path_split[0] == 'SERVER':
-				os.environ[key] = ''
-			elif path_split[0] == 'COOKIE':
-				cookies[key] = ''
-			elif path_split[0] == 'FILES':
-				# Can't remove file uploads, so request has to be stopped.
-				return False
-			else:
-				if len(path_split) == 3:
-					parameters[key][int(path_split[2])] = ''
-				else:
-					parameters[key][0] = ''
+            if path_split[0] == 'SERVER':
+                os.environ[key] = ''
+            elif path_split[0] == 'COOKIE':
+                cookies[key] = ''
+            elif path_split[0] == 'FILES':
+                # Can't remove file uploads, so request has to be stopped.
+                return False
+            else:
+                if len(path_split) == 3:
+                    parameters[key][int(path_split[2])] = ''
+                else:
+                    parameters[key][0] = ''
 
-		# Generate new env from the dicts.
-		os.environ['QUERY_STRING'] = urllib.urlencode(parameters, True)
+        # Generate new env from the dicts.
+        os.environ['QUERY_STRING'] = urllib.urlencode(parameters, True)
 
-		if cookie_string:
-			new_cookie_string = ''
+        if cookie_string:
+            new_cookie_string = ''
 
-			for cookie in cookies:
-				new_cookie_string += cookie + '=' + cookies[cookie] + ';'
+            for cookie in cookies:
+                new_cookie_string += cookie + '=' + cookies[cookie] + ';'
 
-			os.environ['HTTP_COOKIE'] = new_cookie_string
+            os.environ['HTTP_COOKIE'] = new_cookie_string
 
-		# Don't stop the complete request.
-		return True
+        # Don't stop the complete request.
+        return True
 
-	def gather_hashes(self):
-		# Reset hashes.
-		self.hashes = {}
+    def gather_hashes(self):
+        # Reset hashes.
+        self.hashes = {}
 
-		# Calculate hash of script.
-		sha256 = hashlib.sha256()
-		with open(os.environ.get('SCRIPT_FILENAME'), 'rb') as f:
-			for chunk in iter(lambda: f.read(4096), b''):
-				sha256.update(chunk)
+        # Calculate hash of script.
+        sha256 = hashlib.sha256()
+        with open(os.environ.get('SCRIPT_FILENAME'), 'rb') as f:
+            for chunk in iter(lambda: f.read(4096), b''):
+                sha256.update(chunk)
 
-		self.hashes['sha256'] = sha256.hexdigest()
+        self.hashes['sha256'] = sha256.hexdigest()
 
 class OutputCGI(Output):
-	def error(self):
-		print 'Status: 500 Internal Server Error\r\n\r\n'
-		print '<h1>500 Internal Server Error</h1>'
+    def error(self):
+        print 'Status: 500 Internal Server Error\r\n\r\n'
+        print '<h1>500 Internal Server Error</h1>'
 
-		return None
+        return None
 
 def main():
-	input = InputCGI()
-	output = OutputCGI()
+    input = InputCGI()
+    output = OutputCGI()
 
-	if not Connector().start(input, output):
-		sys.exit(0)
+    if not Connector().start(input, output):
+        sys.exit(0)
 
 main()

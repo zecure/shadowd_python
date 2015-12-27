@@ -18,118 +18,118 @@ from .connector import Input, Output, Connector
 from django.http import HttpResponseServerError
 
 class InputDjango(Input):
-	def __init__(self, request):
-		self.request = request
+    def __init__(self, request):
+        self.request = request
 
-	def get_client_ip(self):
-		return self.request.META.get(self.config.get('client_ip', default='REMOTE_ADDR'))
+    def get_client_ip(self):
+        return self.request.META.get(self.config.get('client_ip', default='REMOTE_ADDR'))
 
-	def get_caller(self):
-		return self.request.META.get(self.config.get('caller', default='PATH_INFO'))
+    def get_caller(self):
+        return self.request.META.get(self.config.get('caller', default='PATH_INFO'))
 
-	def get_resource(self):
-		return self.request.get_full_path()
+    def get_resource(self):
+        return self.request.get_full_path()
 
-	def gather_input(self):
-		# Reset input.
-		self.input = {}
+    def gather_input(self):
+        # Reset input.
+        self.input = {}
 
-		# Save GET parameters in input.
-		get_input = self.request.GET
-		for key in get_input:
-			path = 'GET|' + self.escape_key(key)
-			values = get_input.getlist(key)
+        # Save GET parameters in input.
+        get_input = self.request.GET
+        for key in get_input:
+            path = 'GET|' + self.escape_key(key)
+            values = get_input.getlist(key)
 
-			if len(values) > 1:
-				for index, value in enumerate(values):
-					self.input[path + '|' + str(index)] = value
-			else:
-				self.input[path] = values[0]
+            if len(values) > 1:
+                for index, value in enumerate(values):
+                    self.input[path + '|' + str(index)] = value
+            else:
+                self.input[path] = values[0]
 
-		# Save POST parameters in input.
-		post_input = self.request.POST
-		for key in post_input:
-			path = 'POST|' + self.escape_key(key)
-			values = post_input.getlist(key)
+        # Save POST parameters in input.
+        post_input = self.request.POST
+        for key in post_input:
+            path = 'POST|' + self.escape_key(key)
+            values = post_input.getlist(key)
 
-			if len(values) > 1:
-				for index, value in enumerate(values):
-					self.input[path + '|' + str(index)] = value
-			else:
-				self.input[path] = values[0]
+            if len(values) > 1:
+                for index, value in enumerate(values):
+                    self.input[path + '|' + str(index)] = value
+            else:
+                self.input[path] = values[0]
 
-		# Save cookies in input.
-		for key in self.request.COOKIES:
-			self.input['COOKIE|' + self.escape_key(key)] = self.request.COOKIES[key]
+        # Save cookies in input.
+        for key in self.request.COOKIES:
+            self.input['COOKIE|' + self.escape_key(key)] = self.request.COOKIES[key]
 
-		# Save headers in input.
-		for key in self.request.META:
-			if key[:5] == 'HTTP_':
-				self.input['SERVER|' + self.escape_key(key)] = self.request.META[key]
+        # Save headers in input.
+        for key in self.request.META:
+            if key[:5] == 'HTTP_':
+                self.input['SERVER|' + self.escape_key(key)] = self.request.META[key]
 
-		# Save the file names of uploads.
-		files_input = self.request.FILES
-		for key in files_input:
-			path = 'FILES|' + self.escape_key(key)
-			values = files_input.getlist(key)
+        # Save the file names of uploads.
+        files_input = self.request.FILES
+        for key in files_input:
+            path = 'FILES|' + self.escape_key(key)
+            values = files_input.getlist(key)
 
-			if len(values) > 1:
-				for index, value in enumerate(values):
-					self.input[path + '|' + str(index)] = value.name
-			else:
-				self.input[path] = values[0].name
+            if len(values) > 1:
+                for index, value in enumerate(values):
+                    self.input[path + '|' + str(index)] = value.name
+            else:
+                self.input[path] = values[0].name
 
-	def defuse_input(self, threats):
-		# Get the input and create copy to make it mutable.
-		get_input = self.request.GET.copy()
-		post_input = self.request.POST.copy()
+    def defuse_input(self, threats):
+        # Get the input and create copy to make it mutable.
+        get_input = self.request.GET.copy()
+        post_input = self.request.POST.copy()
 
-		# Remove threats.
-		for path in threats:
-			path_split = self.split_path(path)
+        # Remove threats.
+        for path in threats:
+            path_split = self.split_path(path)
 
-			if len(path_split) < 2:
-				continue
+            if len(path_split) < 2:
+                continue
 
-			key = self.unescape_key(path_split[1])
+            key = self.unescape_key(path_split[1])
 
-			if path_split[0] == 'SERVER':
-				self.request.META[key] = ''
-			elif path_split[0] == 'COOKIE':
-				self.request.COOKIES[key] = ''
-			elif path_split[0] == 'GET':
-				if len(path_split) == 3:
-					get_list = get_input.getlist(key)
-					get_list[int(path_split[2])] = ''
+            if path_split[0] == 'SERVER':
+                self.request.META[key] = ''
+            elif path_split[0] == 'COOKIE':
+                self.request.COOKIES[key] = ''
+            elif path_split[0] == 'GET':
+                if len(path_split) == 3:
+                    get_list = get_input.getlist(key)
+                    get_list[int(path_split[2])] = ''
 
-					get_input.setlist(key, get_list)
-				else:
-					get_input[key] = ''
-			elif path_split[0] == 'POST':
-				if len(path_split) == 3:
-					post_list = post_input.getlist(key)
-					post_list[int(path_split[2])] = ''
+                    get_input.setlist(key, get_list)
+                else:
+                    get_input[key] = ''
+            elif path_split[0] == 'POST':
+                if len(path_split) == 3:
+                    post_list = post_input.getlist(key)
+                    post_list[int(path_split[2])] = ''
 
-					post_input.setlist(key, post_list)
-				else:
-					post_input[key] = ''
-			elif path_split[0] == 'FILES':
-				# Can't remove file uploads, so request has to be stopped.
-				return False
+                    post_input.setlist(key, post_list)
+                else:
+                    post_input[key] = ''
+            elif path_split[0] == 'FILES':
+                # Can't remove file uploads, so request has to be stopped.
+                return False
 
-		# Update the GET data.
-		self.request.GET = get_input
+        # Update the GET data.
+        self.request.GET = get_input
 
-		# Update the POST data.
-		self.request.POST = post_input
+        # Update the POST data.
+        self.request.POST = post_input
 
-		# Don't stop the complete request.
-		return True
+        # Don't stop the complete request.
+        return True
 
-	def gather_hashes(self):
-		# Integrity check not supported, because everything is routed through one file.
-		self.hashes = {}
+    def gather_hashes(self):
+        # Integrity check not supported, because everything is routed through one file.
+        self.hashes = {}
 
 class OutputDjango(Output):
-	def error(self):
-		return HttpResponseServerError('<h1>500 Internal Server Error</h1>')
+    def error(self):
+        return HttpResponseServerError('<h1>500 Internal Server Error</h1>')
