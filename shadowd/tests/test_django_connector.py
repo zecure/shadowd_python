@@ -1,13 +1,17 @@
 import unittest
 import shadowd.django_connector
 import django.http
+import django.conf
 
 class TestDjangoConnector(unittest.TestCase):
+	@classmethod
+	def setUpClass(self):
+		django.conf.settings.configure(DEBUG=True)
+
 	def test_get_input(self):
 		r = django.http.HttpRequest()
-		r.encoding = 'utf-8'
-		r.GET = django.http.QueryDict('foo=bar', encoding='utf-8')
-		r.POST = django.http.QueryDict('foo=bar', encoding='utf-8')
+		r.GET = django.http.QueryDict('foo=bar')
+		r.POST = django.http.QueryDict('foo=bar')
 		r.COOKIES = {'foo': 'bar'}
 		r.META = {'HTTP_FOO': 'bar', 'foo': 'bar'}
 
@@ -27,9 +31,8 @@ class TestDjangoConnector(unittest.TestCase):
 
 	def test_get_input_array(self):
 		r = django.http.HttpRequest()
-		r.encoding = 'utf-8'
-		r.GET = django.http.QueryDict('foo=bar1&foo=bar2', encoding='utf-8')
-		r.POST = django.http.QueryDict('foo=bar1&foo=bar2', encoding='utf-8')
+		r.GET = django.http.QueryDict('foo=bar1&foo=bar2')
+		r.POST = django.http.QueryDict('foo=bar1&foo=bar2')
 
 		i = shadowd.django_connector.InputDjango(r)
 		i.gather_input()
@@ -46,9 +49,8 @@ class TestDjangoConnector(unittest.TestCase):
 
 	def test_defuse_input(self):
 		r = django.http.HttpRequest()
-		r.encoding = 'utf-8'
-		r.GET = django.http.QueryDict('foo=bar', encoding='utf-8')
-		r.POST = django.http.QueryDict('foo=bar', encoding='utf-8')
+		r.GET = django.http.QueryDict('foo=bar')
+		r.POST = django.http.QueryDict('foo=bar')
 		r.COOKIES = {'foo': 'bar'}
 		r.META = {'HTTP_FOO': 'bar'}
 
