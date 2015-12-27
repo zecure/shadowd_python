@@ -4,7 +4,8 @@ import django.http
 
 class TestDjangoConnector(unittest.TestCase):
 	def test_get_input(self):
-		r = django.http.HttpRequest(encoding='utf-8')
+		r = django.http.HttpRequest()
+		r.encoding = 'utf-8'
 		r.GET = django.http.QueryDict('foo=bar', encoding='utf-8')
 		r.POST = django.http.QueryDict('foo=bar', encoding='utf-8')
 		r.COOKIES = {'foo': 'bar'}
@@ -25,7 +26,8 @@ class TestDjangoConnector(unittest.TestCase):
 		self.assertNotIn('SERVER|foo', input)
 
 	def test_get_input_array(self):
-		r = django.http.HttpRequest(encoding='utf-8')
+		r = django.http.HttpRequest()
+		r.encoding = 'utf-8'
 		r.GET = django.http.QueryDict('foo=bar1&foo=bar2', encoding='utf-8')
 		r.POST = django.http.QueryDict('foo=bar1&foo=bar2', encoding='utf-8')
 
@@ -43,7 +45,8 @@ class TestDjangoConnector(unittest.TestCase):
 		self.assertEqual(input['POST|foo|1'], 'bar2')
 
 	def test_defuse_input(self):
-		r = django.http.HttpRequest(encoding='utf-8')
+		r = django.http.HttpRequest()
+		r.encoding = 'utf-8'
 		r.GET = django.http.QueryDict('foo=bar', encoding='utf-8')
 		r.POST = django.http.QueryDict('foo=bar', encoding='utf-8')
 		r.COOKIES = {'foo': 'bar'}
