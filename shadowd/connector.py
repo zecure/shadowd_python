@@ -33,6 +33,7 @@ STATUS_BAD_REQUEST               = 2
 STATUS_BAD_SIGNATURE             = 3
 STATUS_BAD_JSON                  = 4
 STATUS_ATTACK                    = 5
+STATUS_CRITICAL_ATTACK           = 6
 
 class Config:
     def __init__(self):
@@ -157,7 +158,7 @@ class Output:
             raise Exception('could not open log file')
 
         datetime = time.strftime('%Y-%m-%d %H:%M:%S')
-        handler.write(datetime + '\t' + message)
+        handler.write(datetime + '\t' + message.rstrip() + '\n')
 
         handler.close()
 
@@ -187,7 +188,8 @@ class Connection:
         }
 
         json_data = json.dumps(input_data)
-        connection.sendall(str(profile) + "\n" + self.sign(key, json_data) + "\n" + json_data + "\n")
+        json_hmac = self.sign(key, json_data)
+        connection.sendall(str(profile) + "\n" + json_hmac + "\n" + json_data + "\n")
 
         output = ''
 
@@ -207,7 +209,9 @@ class Connection:
         data = json.loads(output)
 
         if data['status'] == STATUS_OK:
-            return None
+            return {
+                'attack': False
+            }
         elif data['status'] == STATUS_BAD_REQUEST:
             raise Exception('bad request')
         elif data['status'] == STATUS_BAD_SIGNATURE:
@@ -215,7 +219,16 @@ class Connection:
         elif data['status'] == STATUS_BAD_JSON:
             raise Exception('bad json')
         elif data['status'] == STATUS_ATTACK:
-            return data['threats']
+            return {
+                'attack': True,
+                'critical': False,
+                'threats': data['threats']
+            }
+        elif data['status'] == STATUS_CRITICAL_ATTACK:
+            return {
+                'attack': True,
+                'critical': True
+            }
         else:
             raise Exception('processing error')
 
@@ -243,7 +256,7 @@ class Connector:
 
             # Establish a connection with the server and transmit the data.
             connection = Connection()
-            threats = connection.send(
+            status = connection.send(
                 input,
                 config.get('host', default='127.0.0.1'),
                 config.get('port', default=9115),
@@ -253,18 +266,21 @@ class Connector:
             )
 
             # If observe is not enabled remove threats.
-            if not config.get('observe') and threats:
-                # If defuse_input returns a negative answer this means that the complete request has to
-                # be stopped. This is necessary for threats that can not be removed via the public api.
-                if not input.defuse_input(threats):
+            if not config.get('observe') and status['attack']:
+                if status['critical']:
                     if config.get('debug'):
-                        output.log('shadowd: stopped request from client: ' + input.get_client_ip() + '\n')
+                        output.log('shadowd: stopped critical attack from client: ' + input.get_client_ip())
 
                     return output.error()
 
-            # If debug is enabled log threats.
-            if config.get('debug') and threats:
-                output.log('shadowd: removed threat from client: ' + input.get_client_ip() + '\n')
+                if not input.defuse_input(status['threats']):
+                    if config.get('debug'):
+                        output.log('shadowd: stopped attack from client: ' + input.get_client_ip())
+
+                    return output.error()
+
+                if config.get('debug'):
+                    output.log('shadowd: removed threat from client: ' + input.get_client_ip())
         except:
             if config.get('debug'):
                 tb = traceback.format_exc()
