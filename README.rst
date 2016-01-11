@@ -1,4 +1,10 @@
-**Shadow Daemon** is a collection of tools to **detect**, **protocol** and **prevent** **attacks** on *web applications*. Technically speaking, Shadow Daemon is a **web application firewall** that intercepts requests and filters out malicious parameters. It is a modular system that separates web application, analysis and interface to increase security, flexibility and expandability.
+.. image:: https://travis-ci.org/zecure/shadowd_python.svg
+    :target: https://travis-ci.org/zecure/shadowd_python
+.. image:: http://shadowd.zecure.org/img/logo_small.png
+
+**Shadow Daemon** is a collection of tools to **detect**, **record** and **prevent** **attacks** on *web applications*.
+Technically speaking, Shadow Daemon is a **web application firewall** that intercepts requests and filters out malicious parameters.
+It is a modular system that separates web application, analysis and interface to increase security, flexibility and expandability.
 
 This component can be used to connect Python applications with the `background server <https://github.com/zecure/shadowd>`_.
 
@@ -21,7 +27,8 @@ It is also possible to clone this repository and install the package manually:
 
     python setup.py install
 
-You also have to create a configuration file. You can copy *misc/examples/connectors.ini* to */etc/shadowd/connectors.ini*. The example configuration is annotated and should be self-explanatory.
+You also have to create a configuration file. You can copy *misc/examples/connectors.ini* to */etc/shadowd/connectors.ini*.
+The example configuration is annotated and should be self-explanatory.
 
 CGI
 ---
@@ -33,7 +40,8 @@ To protect CGI applications you simply have to load the module:
 
 Django
 ------
-Django applications require a small modification. It is necessary to create a hook to intercept requests. To do this create the file *middleware/shadowdconnector.py* in the application directory:
+Django applications require a small modification. It is necessary to create a hook to intercept requests.
+To do this create the file *middleware/shadowdconnector.py* in the application directory:
 
 ::
 
@@ -48,7 +56,8 @@ Django applications require a small modification. It is necessary to create a ho
             if not status == True:
                 return status
 
-There also has to be an empty *__init__.py* file in the middleware directory. Next you have to register the middleware in the *settings.py* file of your application:
+There also has to be an empty *__init__.py* file in the middleware directory.
+Next you have to register the middleware in the *settings.py* file of your application:
 
 ::
 

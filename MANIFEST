@@ -6,5 +6,10 @@ shadowd/cgi_connector.py
 shadowd/django_connector.py
 shadowd/flask_connector.py
 shadowd/werkzeug_connector.py
+shadowd/tests/__init__.py
+shadowd/tests/test_connector.py
+shadowd/tests/test_cgi_connector.py
+shadowd/tests/test_django_connector.py
+shadowd/tests/test_werkzeug_connector.py
 misc/examples/connectors.ini
 setup.py

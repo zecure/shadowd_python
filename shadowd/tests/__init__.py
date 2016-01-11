@@ -14,12 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from .werkzeug_connector import InputWerkzeug, Output, Connector
-from flask import abort
+import unittest
 
-class InputFlask(InputWerkzeug):
-    pass
-
-class OutputFlask(Output):
-    def error(self):
-        abort(500)
+def test_all():
+    return unittest.TestLoader().loadTestsFromNames([
+        'shadowd.tests.test_connector',
+        'shadowd.tests.test_cgi_connector',
+        'shadowd.tests.test_django_connector',
+        'shadowd.tests.test_werkzeug_connector',
+    ])
