@@ -53,7 +53,7 @@ To do this create the file *middleware/shadowdconnector.py* in the application d
             output = OutputDjango()
 
             status = Connector().start(input, output)
-            if not status == True:
+            if not status:
                 return status
 
 There also has to be an empty *__init__.py* file in the middleware directory.
