@@ -1,5 +1,7 @@
 .. image:: https://travis-ci.org/zecure/shadowd_python.svg
     :target: https://travis-ci.org/zecure/shadowd_python
+.. image:: https://sonarcloud.io/api/project_badges/measure?project=zecure_shadowd_python&metric=alert_status
+    :target: https://sonarcloud.io/dashboard?id=zecure_shadowd_python
 .. image:: http://shadowd.zecure.org/img/logo_small.png
 
 **Shadow Daemon** is a collection of tools to **detect**, **record** and **prevent** **attacks** on *web applications*.
