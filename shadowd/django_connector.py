@@ -1,6 +1,6 @@
 # Shadow Daemon -- Web Application Firewall
 #
-# Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
+# Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
 #
 # This file is part of Shadow Daemon. Shadow Daemon is free software: you can
 # redistribute it and/or modify it under the terms of the GNU General Public
@@ -16,6 +16,7 @@
 
 from .connector import Input, Output, Connector
 from django.http import HttpResponseServerError
+
 
 class InputDjango(Input):
     def __init__(self, request):

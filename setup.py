@@ -2,7 +2,7 @@
 #
 # Shadow Daemon -- Web Application Firewall
 #
-# Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
+# Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
 #
 # This file is part of Shadow Daemon. Shadow Daemon is free software: you can
 # redistribute it and/or modify it under the terms of the GNU General Public
@@ -24,7 +24,7 @@ long_description = open(README).read() + '\n\n'
 
 setup(
     name='shadowd',
-    version='2.0.0',
+    version='3.0.1',
     description='Python connector for the Shadow Daemon web application firewall',
     long_description=long_description,
     url='http://github.com/zecure/shadowd_python',

@@ -1,6 +1,6 @@
 # Shadow Daemon -- Web Application Firewall
 #
-# Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
+# Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
 #
 # This file is part of Shadow Daemon. Shadow Daemon is free software: you can
 # redistribute it and/or modify it under the terms of the GNU General Public
@@ -17,11 +17,12 @@
 import os
 import sys
 import cgi
-import Cookie
 import urllib
 import hashlib
+import http
 
 from .connector import Input, Output, Connector
+
 
 class InputCGI(Input):
     def get_client_ip(self):
@@ -55,7 +56,7 @@ class InputCGI(Input):
         # Save cookies in input.
         cookie_string = os.environ.get('HTTP_COOKIE')
         if cookie_string:
-            cookie = Cookie.SimpleCookie()
+            cookie = http.cookies.SimpleCookie()
             cookie.load(cookie_string)
 
             for key in cookie:
@@ -79,7 +80,7 @@ class InputCGI(Input):
 
         cookie_string = os.environ.get('HTTP_COOKIE')
         if cookie_string:
-            cookie = Cookie.SimpleCookie()
+            cookie = http.cookies.SimpleCookie()
             cookie.load(cookie_string)
 
             for key in cookie:
@@ -108,7 +109,7 @@ class InputCGI(Input):
                     parameters[key][0] = ''
 
         # Generate new env from the dicts.
-        os.environ['QUERY_STRING'] = urllib.urlencode(parameters, True)
+        os.environ['QUERY_STRING'] = urllib.parse.urlencode(parameters, True)
 
         if cookie_string:
             new_cookie_string = ''
@@ -135,8 +136,8 @@ class InputCGI(Input):
 
 class OutputCGI(Output):
     def error(self):
-        print 'Status: 500 Internal Server Error\r\n\r\n'
-        print '<h1>500 Internal Server Error</h1>'
+        print('Status: 500 Internal Server Error\r\n\r\n')
+        print('<h1>500 Internal Server Error</h1>')
 
         return None
 

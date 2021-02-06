@@ -1,6 +1,6 @@
 # Shadow Daemon -- Web Application Firewall
 #
-# Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
+# Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
 #
 # This file is part of Shadow Daemon. Shadow Daemon is free software: you can
 # redistribute it and/or modify it under the terms of the GNU General Public
@@ -19,6 +19,7 @@ import unittest
 
 os.environ['SHADOWD_NO_AUTOLOAD'] = '1'
 import shadowd.cgi_connector
+
 
 class TestCgiConnector(unittest.TestCase):
     def test_get_input(self):
