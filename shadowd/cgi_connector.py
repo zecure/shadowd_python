@@ -17,9 +17,9 @@
 import os
 import sys
 import cgi
-import Cookie
 import urllib
 import hashlib
+import http
 
 from .connector import Input, Output, Connector
 
@@ -56,7 +56,7 @@ class InputCGI(Input):
         # Save cookies in input.
         cookie_string = os.environ.get('HTTP_COOKIE')
         if cookie_string:
-            cookie = Cookie.SimpleCookie()
+            cookie = http.cookies.SimpleCookie()
             cookie.load(cookie_string)
 
             for key in cookie:
@@ -80,7 +80,7 @@ class InputCGI(Input):
 
         cookie_string = os.environ.get('HTTP_COOKIE')
         if cookie_string:
-            cookie = Cookie.SimpleCookie()
+            cookie = http.cookies.SimpleCookie()
             cookie.load(cookie_string)
 
             for key in cookie:
@@ -109,7 +109,7 @@ class InputCGI(Input):
                     parameters[key][0] = ''
 
         # Generate new env from the dicts.
-        os.environ['QUERY_STRING'] = urllib.urlencode(parameters, True)
+        os.environ['QUERY_STRING'] = urllib.parse.urlencode(parameters, True)
 
         if cookie_string:
             new_cookie_string = ''
