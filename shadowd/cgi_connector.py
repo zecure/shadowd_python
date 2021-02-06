@@ -1,6 +1,6 @@
 # Shadow Daemon -- Web Application Firewall
 #
-# Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
+# Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
 #
 # This file is part of Shadow Daemon. Shadow Daemon is free software: you can
 # redistribute it and/or modify it under the terms of the GNU General Public
@@ -22,6 +22,7 @@ import urllib
 import hashlib
 
 from .connector import Input, Output, Connector
+
 
 class InputCGI(Input):
     def get_client_ip(self):
@@ -135,8 +136,8 @@ class InputCGI(Input):
 
 class OutputCGI(Output):
     def error(self):
-        print 'Status: 500 Internal Server Error\r\n\r\n'
-        print '<h1>500 Internal Server Error</h1>'
+        print('Status: 500 Internal Server Error\r\n\r\n')
+        print('<h1>500 Internal Server Error</h1>')
 
         return None
 

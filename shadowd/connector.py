@@ -1,6 +1,6 @@
 # Shadow Daemon -- Web Application Firewall
 #
-# Copyright (C) 2014-2016 Hendrik Buchwald <hb@zecure.org>
+# Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
 #
 # This file is part of Shadow Daemon. Shadow Daemon is free software: you can
 # redistribute it and/or modify it under the terms of the GNU General Public
@@ -17,7 +17,7 @@
 import os
 import time
 import traceback
-import ConfigParser
+import configparser
 import re
 import socket
 import ssl
@@ -25,7 +25,8 @@ import json
 import hmac
 import hashlib
 
-SHADOWD_CONNECTOR_VERSION        = '2.0.0-python'
+
+SHADOWD_CONNECTOR_VERSION        = '3.0.0-python'
 SHADOWD_CONNECTOR_CONFIG         = '/etc/shadowd/connectors.ini'
 SHADOWD_CONNECTOR_CONFIG_SECTION = 'shadowd_python'
 STATUS_OK                        = 1
@@ -35,6 +36,7 @@ STATUS_BAD_JSON                  = 4
 STATUS_ATTACK                    = 5
 STATUS_CRITICAL_ATTACK           = 6
 
+
 class Config:
     def __init__(self):
         if os.environ.get('SHADOWD_CONNECTOR_CONFIG'):
@@ -42,7 +44,7 @@ class Config:
         else:
             self.file = SHADOWD_CONNECTOR_CONFIG
 
-        self.config = ConfigParser.ConfigParser()
+        self.config = configparser.ConfigParser()
         self.config.read(self.file)
 
         if os.environ.get('SHADOWD_CONNECTOR_CONFIG_SECTION'):
@@ -53,7 +55,7 @@ class Config:
     def get(self, key, required = False, default = None):
         try:
             return self.config.get(self.section, key)
-        except ConfigParser.NoOptionError:
+        except configparser.NoOptionError:
             if required:
                 raise Exception(key + ' in config missing')
             else:
@@ -189,7 +191,8 @@ class Connection:
 
         json_data = json.dumps(input_data)
         json_hmac = self.sign(key, json_data)
-        connection.sendall(str(profile) + "\n" + json_hmac + "\n" + json_data + "\n")
+        data_bytes = bytes(str(profile) + "\n" + json_hmac + "\n" + json_data + "\n", 'utf-8')
+        connection.sendall(data_bytes)
 
         output = ''
 
@@ -199,7 +202,7 @@ class Connection:
             if not new_output:
                 break
 
-            output += new_output
+            output += new_output.decode("utf-8")
 
         connection.close()
 
@@ -233,7 +236,9 @@ class Connection:
             raise Exception('processing error')
 
     def sign(self, key, json):
-        return hmac.new(key, json, hashlib.sha256).hexdigest()
+        key_bytes = bytes(key , 'utf-8')
+        json_bytes = bytes(json, 'utf-8')
+        return hmac.new(key_bytes, json_bytes, hashlib.sha256).hexdigest()
 
 class Connector:
     def start(self, input, output):
