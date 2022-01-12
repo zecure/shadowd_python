@@ -49,14 +49,19 @@ To do this create the file *middleware/shadowdconnector.py* in the application d
 
     from shadowd.django_connector import InputDjango, OutputDjango, Connector
 
-    class ShadowdConnectorMiddleware(object):
-        def process_request(self, request):
+    def shadowd_connector(get_response):
+        def middleware(request):
             input = InputDjango(request)
             output = OutputDjango()
 
             status = Connector().start(input, output)
             if not status == True:
                 return status
+
+            return get_response(request)
+
+        return middleware
+
 
 There also has to be an empty *__init__.py* file in the middleware directory.
 Next you have to register the middleware in the *settings.py* file of your application:
