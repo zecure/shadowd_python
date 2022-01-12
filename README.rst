@@ -49,7 +49,7 @@ To do this create the file *middleware/shadowdconnector.py* in the application d
 
     from shadowd.django_connector import InputDjango, OutputDjango, Connector
 
-    def shadowd_connector(get_response):
+    def shadowdconnector(get_response):
         def middleware(request):
             input = InputDjango(request)
             output = OutputDjango()
@@ -69,7 +69,7 @@ Next you have to register the middleware in the *settings.py* file of your appli
 ::
 
     MIDDLEWARE_CLASSES = (
-        'middleware.shadowdconnector.ShadowdConnectorMiddleware',
+        'middleware.shadowdconnector.shadowdconnector',
         # ...
     )
 
