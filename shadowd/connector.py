@@ -264,7 +264,7 @@ class Connector:
             status = connection.send(
                 input,
                 config.get('host', default='127.0.0.1'),
-                config.get('port', default=9115),
+                int(config.get('port', default=9115)),
                 config.get('profile', required=True),
                 config.get('key', required=True),
                 config.get('ssl')
