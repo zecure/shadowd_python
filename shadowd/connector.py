@@ -101,7 +101,7 @@ class Input:
         handler.close()
 
         for entry in json_data:
-            if not 'path' in entry and 'caller' in entry:
+            if 'path' not in entry and 'caller' in entry:
                 if self.get_caller() == entry['caller']:
                     self.input = {}
                     break
