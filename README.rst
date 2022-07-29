@@ -4,11 +4,8 @@
 .. image:: https://sonarcloud.io/api/project_badges/measure?project=zecure_shadowd_python&metric=alert_status
     :target: https://sonarcloud.io/dashboard?id=zecure_shadowd_python
 
-**Shadow Daemon** is a collection of tools to **detect**, **record** and **prevent** **attacks** on *web applications*.
-Technically speaking, Shadow Daemon is a **web application firewall** that intercepts requests and filters out malicious parameters.
-It is a modular system that separates web application, analysis and interface to increase security, flexibility and expandability.
-
-This component can be used to connect Python applications with the `background server <https://github.com/zecure/shadowd>`_.
+**Shadow Daemon** is a *web application firewall* that intercepts requests at application-level.
+This repository contains a component of Shadow Daemon to connect Python applications with the `shadowd <https://github.com/zecure/shadowd>`_ server.
 
 Documentation
 =============
