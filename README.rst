@@ -1,14 +1,11 @@
-.. image:: http://shadowd.zecure.org/img/logo_small.png
-.. image:: https://travis-ci.org/zecure/shadowd_python.svg
-    :target: https://travis-ci.org/zecure/shadowd_python
+.. image:: https://shadowd.zecure.org/img/logo_small.png
+.. image:: https://github.com/zecure/shadowd_python/actions/workflows/analyze.yml/badge.svg
+    :target: https://github.com/zecure/shadowd_python/actions/workflows/analyze.yml
 .. image:: https://sonarcloud.io/api/project_badges/measure?project=zecure_shadowd_python&metric=alert_status
     :target: https://sonarcloud.io/dashboard?id=zecure_shadowd_python
 
-**Shadow Daemon** is a collection of tools to **detect**, **record** and **prevent** **attacks** on *web applications*.
-Technically speaking, Shadow Daemon is a **web application firewall** that intercepts requests and filters out malicious parameters.
-It is a modular system that separates web application, analysis and interface to increase security, flexibility and expandability.
-
-This component can be used to connect Python applications with the `background server <https://github.com/zecure/shadowd>`_.
+**Shadow Daemon** is a *web application firewall* that intercepts requests at application-level.
+This repository contains a component of Shadow Daemon to connect Python applications with the `shadowd <https://github.com/zecure/shadowd>`_ server.
 
 Documentation
 =============
@@ -49,8 +46,8 @@ To do this create the file *middleware/shadowdconnector.py* in the application d
 
     from shadowd.django_connector import InputDjango, OutputDjango, Connector
 
-    class ShadowdConnectorMiddleware(object):
-        def process_request(self, request):
+    def shadowdconnector(get_response):
+        def middleware(request):
             input = InputDjango(request)
             output = OutputDjango()
 
@@ -58,13 +55,18 @@ To do this create the file *middleware/shadowdconnector.py* in the application d
             if not status == True:
                 return status
 
+            return get_response(request)
+
+        return middleware
+
+
 There also has to be an empty *__init__.py* file in the middleware directory.
 Next you have to register the middleware in the *settings.py* file of your application:
 
 ::
 
     MIDDLEWARE_CLASSES = (
-        'middleware.shadowdconnector.ShadowdConnectorMiddleware',
+        'middleware.shadowdconnector.shadowdconnector',
         # ...
     )
 

@@ -1,6 +1,6 @@
 # Shadow Daemon -- Web Application Firewall
 #
-# Copyright (C) 2014-2021 Hendrik Buchwald <hb@zecure.org>
+# Copyright (C) 2014-2022 Hendrik Buchwald <hb@zecure.org>
 #
 # This file is part of Shadow Daemon. Shadow Daemon is free software: you can
 # redistribute it and/or modify it under the terms of the GNU General Public
@@ -26,7 +26,7 @@ import hmac
 import hashlib
 
 
-SHADOWD_CONNECTOR_VERSION        = '3.0.1-python'
+SHADOWD_CONNECTOR_VERSION        = '3.0.2-python'
 SHADOWD_CONNECTOR_CONFIG         = '/etc/shadowd/connectors.ini'
 SHADOWD_CONNECTOR_CONFIG_SECTION = 'shadowd_python'
 STATUS_OK                        = 1
@@ -101,7 +101,7 @@ class Input:
         handler.close()
 
         for entry in json_data:
-            if not 'path' in entry and 'caller' in entry:
+            if 'path' not in entry and 'caller' in entry:
                 if self.get_caller() == entry['caller']:
                     self.input = {}
                     break
@@ -264,7 +264,7 @@ class Connector:
             status = connection.send(
                 input,
                 config.get('host', default='127.0.0.1'),
-                config.get('port', default=9115),
+                int(config.get('port', default=9115)),
                 config.get('profile', required=True),
                 config.get('key', required=True),
                 config.get('ssl')
